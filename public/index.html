@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Express Multer Uploads</title>
+</head>
+
+<body>
+  <style>
+    form {
+      display: flex;
+      flex-direction: column;
+      max-width: 500px;
+      margin: 1rem auto;
+    }
+    input {
+      margin-bottom: 1rem;
+    }
+  </style>
+  <h1>Express Multer Uploads!</h1>
+  <form action="/upload" method="POST" enctype="multipart/form-data">
+        <label for="file">File</label>
+        <input type="file" name="file" id="file" accept="video/mp4 image/png image/jpeg audio/mpeg" multiple>
+        <div id="dropzone" style="border: dotted;width:500px;height:100px;">
+            drop here
+        </div>
+        <br>
+        <button type="submit">Send</button>
+  </form>
+</body>
+<script>
+    let filefiled = document.getElementById('file');
+    let dropzone = document.getElementById('dropzone');
+    let dt = new DataTransfer();
+
+
+    document.addEventListener('drop', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+    });
+    document.addEventListener('dragover', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+    });
+    document.addEventListener('dragenter', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+    });
+
+    dropzone.addEventListener('drop', (e)=>{
+        e.stopPropagation();
+        e.preventDefault();
+        dt.items.add(e.dataTransfer.files[0]);
+        filefiled.files = dt.files;
+    });
+
+</script>
+</html>
