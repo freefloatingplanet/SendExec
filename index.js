@@ -10,6 +10,7 @@ const {exec} = require('child_process')
 
 app.listen(conf.port, () => {
   console.log('Running at Port '+conf.port+'...');
+  console.log('Open http://localhost:'+conf.port);
 });
 
 // 静的ファイルのルーティング
@@ -22,8 +23,8 @@ app.use(bodyParser.json());
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        let path = 'tmp/' + getNowDateTime()+'/';
-        fs.mkdirSync(path);
+        let path = 'tmp/' + getNowDateTime()+'/src/';
+        fs.mkdirSync(path, {recursive:true});
         cb(null, path);
     },
     filename: function (req, file, cb) {
@@ -39,16 +40,36 @@ app.post('/upload', upload.array('file'), (req, res) => {
 //    const content2 = fs.readFileSync(req.files[1].path, 'utf-8');
 //    res.send(content1+content2);
     console.log(content1);
+    const basedir = path.dirname(req.files[0].path);
+    const parentdir = path.dirname(basedir);
 
-    exec('sh ./external/sample.sh', (err,stdout,stderr) => {
+    exec('sh ./external/exec.sh '+parentdir, (err,stdout,stderr) => {
         if(err){
             console.log(`stderr: ${stderr}`);
             return;
         }
+        // file1
+        let count=0;
+        let filename = parentdir + '/aaa.csv' 
+        while(count < 10){
+            if(fs.existsSync(filename)){
+                count = 10;
+            }else{
+                count ++;
+            }    
+        }
+
+        // file2
+
         console.log(`stdout: ${stdout}`)
+
+        res.set('Content-disposition','attachment; filename=aaa.csv');
+        const data = fs.readFileSync(filename);
+        res.send(data);
+
+
     })
 
-    res.send(content1);
 });
 
 const getNowDateTime = () => {
@@ -63,3 +84,4 @@ const getNowDateTime = () => {
   
     return Y + M + D + h + m + s + sss
   }
+  
